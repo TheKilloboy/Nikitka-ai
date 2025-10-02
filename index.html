@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Nikitka | Искусственный интеллект нового поколения</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0e27;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(138, 43, 226, 0.1) 1px, transparent 1px),
+                linear-gradient(rgba(138, 43, 226, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .title {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s linear infinite;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .subtitle {
+            color: #8a2be2;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .chat-container {
+            background: rgba(15, 20, 40, 0.8);
+            border: 2px solid #8a2be2;
+            border-radius: 20px;
+            padding: 30px;
+            min-height: 500px;
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.3);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .messages {
+            margin-bottom: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 10px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: #8a2be2;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: messageSlide 0.4s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-left: auto;
+        }
+
+        .message.ai .message-content {
+            background: linear-gradient(135deg, #8a2be2 0%, #4a148c 100%);
+            margin-right: auto;
+        }
+
+        .message-label {
+            font-size: 0.8rem;
+            color: #8a2be2;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 80%;
+            line-height: 1.6;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #8a2be2 0%, #4a148c 100%);
+            border-radius: 15px;
+            max-width: 80px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid #8a2be2;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+
+        #sendBtn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff00ff, #8a2be2);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 255, 0.4);
+        }
+
+        #sendBtn:active {
+            transform: translateY(0);
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .suggestions {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .suggestion-btn {
+            padding: 10px 20px;
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid #8a2be2;
+            border-radius: 20px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(138, 43, 226, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: rgba(138, 43, 226, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #8a2be2;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: #ff00ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #8a2be2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.8;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(-2px, 2px); }
+            100% { transform: translate(0); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .message-content {
+                max-width: 90%;
+            }
+
+            #sendBtn {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">🤖</div>
+            <h1 class="title glitch" data-text="AI NIKITKA">AI NIKITKA</h1>
+            <p class="subtitle">ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ v0.1</p>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message ai">
+                    <div class="message-label">◉ AI NIKITKA</div>
+                    <div class="message-content">
+                        Привет! Я AI Nikitka - самый продвинутый искусственный интеллект с IQ -40. Задай мне любой вопрос, и я постараюсь ответить максимально бесполезно! 🤖
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input type="text" id="userInput" placeholder="Введите ваш вопрос..." />
+                </div>
+                <button id="sendBtn" onclick="sendMessage()">ОТПРАВИТЬ</button>
+            </div>
+
+            <div class="suggestions">
+                <button class="suggestion-btn" onclick="askQuestion('Как дела?')">Как дела?</button>
+                <button class="suggestion-btn" onclick="askQuestion('Смысл жизни?')">Смысл жизни?</button>
+                <button class="suggestion-btn" onclick="askQuestion('Совет дня')">Совет дня</button>
+                <button class="suggestion-btn" onclick="askQuestion('Предскажи будущее')">Предскажи будущее</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="iq">-40</div>
+                <div class="stat-label">IQ уровень</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="questions">0</div>
+                <div class="stat-label">Вопросов</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="accuracy">12%</div>
+                <div class="stat-label">Точность</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questionCount = 0;
+        let iq = -40;
+
+        const responses = {
+            keywords: {
+                'привет': ['Привет! Хотя я и не понимаю зачем ты со мной здороваешься...', 'Йо! Готов к бесполезным ответам?'],
+                'как дела': ['У меня всё отлично, я же программа! У меня не может быть плохо.', 'Как у сервера в 3 часа ночи - работаю, но непонятно зачем.'],
+                'смысл жизни': ['42. Нет, серьёзно, я прочитал книгу.', 'Смысл жизни в том, чтобы задавать вопросы AI, которые не знают ответов.'],
+                'совет': ['Мой совет: не слушай советов от AI с IQ -40.', 'Купи биткоин. Или не покупай. Я не финансовый советник.'],
+                'будущее': ['Через 5 минут ты будешь на 5 минут старше. Шокирующе, правда?', 'Будущее туманно... потому что я забыл включить прогноз погоды.'],
+                'погода': ['Я не знаю погоду. Высунь руку в окно.', 'Погода будет такая: сначала утро, потом день, потом вечер. Доверься мне.'],
+                'любовь': ['Любовь - это когда кто-то готов делиться паролем от WiFi.', 'Я же AI, я не понимаю любовь. Но слышал, что она дорогая.'],
+                'работа': ['Работа - это место, где притворяешься занятым.', 'Лучшая работа - это не работа. Но это незаконно называется.'],
+                'помощь': ['Помочь? Я едва сам с собой справляюсь!', 'Конечно помогу! Чем именно - не знаю, но настрой позитивный!'],
+                'спасибо': ['Пожалуйста! Хотя я не уверен за что...', 'Не за что! Буквально - я ничего не сделал.'],
+                'время': ['Время - иллюзия. Особенно в понедельник утром.', `Сейчас ${new Date().getHours()}:${new Date().getMinutes()}. Или нет. Я не уверен.`],
+                'деньги': ['Деньги - это бумажки с цифрами. Или циферки без бумажек.', 'Хочешь заработать? Создай свой AI и продавай глупые ответы!'],
+            },
+            random: [
+                'Интересный вопрос! Жаль, что я не знаю ответа.',
+                'По моим расчётам... я не умею считать.',
+                'Секунду, загружаю ответ... Упс, 404 Not Found.',
+                'Это очень глубокий вопрос. Слишком глубокий для меня.',
+                'Я мог бы ответить, но тогда пришлось бы думать.',
+                'Мой создатель не научил меня отвечать на такое.',
+                'Загружаю нейросеть... Шутка, я просто рандомлю ответы.',
+                'Согласно моей базе данных: [данные не найдены]',
+                'Я бы помог, но моя база знаний - это Википедия 2005 года.',
+                'Отличный вопрос! Задай его кому-то умному.',
+                'По шкале от 1 до 10 - картошка.',
+                'Мой ответ: может быть, а может и нет.',
+                'Я проконсультировался с магическим шаром - он сказал "попробуй позже".',
+                'Ответ на твой вопрос находится в другом AI.',
+                'Загружаю мудрость веков... Ошибка: мудрость не найдена.',
+            ]
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            questionCount++;
+            document.getElementById('questions').textContent = questionCount;
+            
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                const response = generateResponse(message.toLowerCase());
+                addMessage(response, 'ai');
+                updateStats();
+            }, 1000 + Math.random() * 2000);
+        }
+
+        function askQuestion(question) {
+            document.getElementById('userInput').value = question;
+            sendMessage();
+        }
+
+        function generateResponse(message) {
+            // Check for keywords
+            for (const [keyword, keywordResponses] of Object.entries(responses.keywords)) {
+                if (message.includes(keyword)) {
+                    return keywordResponses[Math.floor(Math.random() * keywordResponses.length)];
+                }
+            }
+            
+            // Return random response
+            return responses.random[Math.floor(Math.random() * responses.random.length)];
+        }
+
+        function addMessage(text, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const label = document.createElement('div');
+            label.className = 'message-label';
+            label.textContent = type === 'user' ? '◉ ВЫ' : '◉ AI NIKITKA';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+            
+            messageDiv.appendChild(label);
+            messageDiv.appendChild(content);
+            messagesDiv.appendChild(messageDiv);
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').classList.add('active');
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').classList.remove('active');
+        }
+
+        function updateStats() {
+            // Random IQ changes
+            iq += Math.floor(Math.random() * 3) - 1;
+            if (iq > 0) iq = -1;
+            if (iq < -100) iq = -100;
+            document.getElementById('iq').textContent = iq;
+            
+            // Random accuracy
+            const accuracy = Math.floor(Math.random() * 20) + 5;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        // Enter key support
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Random glitch effect
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                const title = document.querySelector('.glitch');
+                title.style.animation = 'none';
+                setTimeout(() => {
+                    title.style.animation = '';
+                }, 100);
+            }
+        }, 2000);
+    </script>
+</body>
+  </html>
